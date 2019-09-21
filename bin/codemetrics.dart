@@ -16,19 +16,27 @@ main(List<String> args) {
       help: 'Root path from which all dart files will be analyzed');
   parser.addOption('analysis-file',
       defaultsTo: '', help: 'File to be analyzed');
+  parser.addOption('analysis-files',
+      defaultsTo: '', help: 'Files to be analyzed');
   parser.addOption('begin-warning-complexity-number', defaultsTo: '0');
   parser.addOption('begin-error-complexity-number', defaultsTo: '0');
   parser.addOption('print-all', defaultsTo: 'false');
 
   var arguments = parser.parse(args);
 
-  List<FileSystemEntity> dartFiles;
-  if (arguments['analysis-file'] != '' &&
-      FileSystemEntity.typeSync(arguments['analysis-file']) !=
-          FileSystemEntityType.notFound) {
-    dartFiles = [
-      File.fromUri(Uri.file(arguments['analysis-file'].toString().trim()))
-    ];
+  List<FileSystemEntity> dartFiles = [];
+  if (arguments['analysis-file'] != '') {
+    dartFiles = [fileFromPath(arguments['analysis-file'])]
+        .where((file) => file != null)
+        .toList();
+  } else if (arguments['analysis-files'] != '') {
+    dartFiles = arguments['analysis-files']
+        .toString()
+        .split(',')
+        .where((paths) => paths.replaceAll(RegExp(','), '').isNotEmpty)
+        .map(fileFromPath)
+        .where((file) => file != null)
+        .toList();
   } else {
     dartFiles = new Glob('**.dart')
         .listSync(root: arguments['analysis-root'], followLinks: false);
@@ -73,3 +81,8 @@ main(List<String> args) {
   }
   reporter.getReport().then(stdout.write);
 }
+
+File fileFromPath(String path) =>
+    FileSystemEntity.typeSync(path) == FileSystemEntityType.notFound
+        ? null
+        : File.fromUri(Uri.file(path));
