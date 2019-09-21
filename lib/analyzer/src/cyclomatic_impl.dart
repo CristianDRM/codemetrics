@@ -3,9 +3,9 @@ part of codemetrics.analyzer;
 String _getQualifiedName(ScopedDeclaration dec) {
   Declaration declaration = dec.declaration;
   if (declaration is FunctionDeclaration) {
-    return declaration.name.toString();
+    return declaration?.name.toString() ?? '';
   } else if (declaration is MethodDeclaration) {
-    return "${dec.enclosingClass.name}.${declaration.name}";
+    return "${dec.enclosingClass?.name ?? ''}.${declaration.name}";
   }
   return null;
 }
@@ -83,9 +83,10 @@ class CyclomaticAnalyzer extends Object
   }
 
   BuiltList<ScopedDeclaration> getDeclarations(String filePath) {
-    var compUnit = parseDartFile(filePath);
-    var callableVisitor = new CallableAstVisitor();
-    compUnit.visitChildren(callableVisitor);
+    var compUnit =
+        parseFile(path: filePath, featureSet: FeatureSet.fromEnableFlags([]));
+    var callableVisitor = CallableAstVisitor();
+    compUnit.unit.visitChildren(callableVisitor);
     return callableVisitor.declarations;
   }
 

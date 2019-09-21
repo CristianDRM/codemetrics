@@ -1,8 +1,9 @@
 library codemetrics.cyclomatic.test;
 
+import 'package:analyzer/analyzer.dart';
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:codemetrics/cyclomatic/cyclomatic.dart';
 import 'package:test/test.dart';
-import 'package:analyzer/analyzer.dart';
 
 const String _TEST_COMP_UNIT = '''
 class A {
