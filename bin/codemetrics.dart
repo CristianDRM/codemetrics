@@ -23,7 +23,9 @@ main(List<String> args) {
   var arguments = parser.parse(args);
 
   List<FileSystemEntity> dartFiles;
-  if (arguments['analysis-file'] != '') {
+  if (arguments['analysis-file'] != '' &&
+      FileSystemEntity.typeSync(arguments['analysis-file']) !=
+          FileSystemEntityType.notFound) {
     dartFiles = [
       File.fromUri(Uri.file(arguments['analysis-file'].toString().trim()))
     ];
