@@ -14,24 +14,30 @@ main(List<String> args) {
   parser.addOption('analysis-root',
       defaultsTo: './',
       help: 'Root path from which all dart files will be analyzed');
-
+  parser.addOption('analysis-file',
+      defaultsTo: '', help: 'File to be analyzed');
   parser.addOption('begin-warning-complexity-number', defaultsTo: '0');
   parser.addOption('begin-error-complexity-number', defaultsTo: '0');
   parser.addOption('print-all', defaultsTo: 'false');
 
   var arguments = parser.parse(args);
 
-  var dartFiles = new Glob('**.dart')
-      .listSync(root: arguments['analysis-root'], followLinks: false);
-  dartFiles.removeWhere((FileSystemEntity entity) {
-    if (entity is! File) return true;
-    if (entity is File) {
-      for (String ignoredPathPart in IGNORED_PATH_PARTS) {
-        if (entity.path.contains(ignoredPathPart)) return true;
+  List<FileSystemEntity> dartFiles;
+  if (arguments['analysis-file'] != '') {
+    dartFiles = [File.fromRawPath(arguments['analysis-file'])];
+  } else {
+    dartFiles = new Glob('**.dart')
+        .listSync(root: arguments['analysis-root'], followLinks: false);
+    dartFiles.removeWhere((FileSystemEntity entity) {
+      if (entity is! File) return true;
+      if (entity is File) {
+        for (String ignoredPathPart in IGNORED_PATH_PARTS) {
+          if (entity.path.contains(ignoredPathPart)) return true;
+        }
       }
-    }
-    return false;
-  });
+      return false;
+    });
+  }
 
   var dartFilePaths = dartFiles
       .map((FileSystemEntity entity) => entity.path)
