@@ -24,7 +24,7 @@ main(List<String> args) {
 
   List<FileSystemEntity> dartFiles;
   if (arguments['analysis-file'] != '') {
-    dartFiles = [File.fromRawPath(arguments['analysis-file'])];
+    dartFiles = [File.fromUri(Uri.file(arguments['analysis-file']))];
   } else {
     dartFiles = new Glob('**.dart')
         .listSync(root: arguments['analysis-root'], followLinks: false);
